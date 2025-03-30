@@ -1,5 +1,5 @@
 // https://www.youtube.com/watch?v=4q2vvZn5aoo&list=PLpPnRKq7eNW16Wq1GQjQjpTo_E0taH0La&index=2
-// 40:37'
+// 01:14'
 
 import platform from '../img/platform.png'
 console.log('platform', platform)
