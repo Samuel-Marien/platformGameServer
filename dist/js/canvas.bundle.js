@@ -189,8 +189,6 @@ var Player = /*#__PURE__*/function () {
       this.position.x += this.velocity.x;
       if (this.position.y + this.height + this.velocity.y <= canvas.height) {
         this.velocity.y += gravity;
-      } else {
-        this.velocity.y = 0;
       }
     }
   }]);
@@ -261,6 +259,10 @@ var platforms = [new Platform({
   x: platformImage.width - 3,
   y: 470,
   image: platformImage
+}), new Platform({
+  x: platformImage.width * 2 + 100,
+  y: 470,
+  image: platformImage
 })];
 var genericObjects = [new GenericObject({
   x: -1,
@@ -280,10 +282,40 @@ var keys = {
   }
 };
 var scrollOffset = 0;
+function init() {
+  // console.log('image', image)
+  platformImage = createImage(_img_platform_png__WEBPACK_IMPORTED_MODULE_0__["default"]);
+  player = new Player();
+  platforms = [new Platform({
+    x: -1,
+    y: 470,
+    image: platformImage
+  }), new Platform({
+    x: platformImage.width - 3,
+    y: 470,
+    image: platformImage
+  }), new Platform({
+    x: platformImage.width * 2 + 100,
+    y: 470,
+    image: platformImage
+  })];
+  genericObjects = [new GenericObject({
+    x: -1,
+    y: -1,
+    image: createImage(_img_background_png__WEBPACK_IMPORTED_MODULE_2__["default"])
+  }), new GenericObject({
+    x: -1,
+    y: -1,
+    image: createImage(_img_hills_png__WEBPACK_IMPORTED_MODULE_1__["default"])
+  })];
+  scrollOffset = 0;
+}
 function animate() {
-  requestAnimationFrame(animate);
+  requestAnimationFrame(animate); // Make the loop
   c.fillStyle = 'white';
   c.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Backgroud needed to be place in first
   genericObjects.forEach(function (genericObject) {
     genericObject.draw();
   });
@@ -291,6 +323,8 @@ function animate() {
     platform.draw();
   });
   player.update();
+
+  // Player movements
   if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = 5;
   } else if (keys.left.pressed && player.position.x > 100) {
@@ -324,8 +358,16 @@ function animate() {
       player.velocity.y = 0;
     }
   });
+
+  // WIn condition
   if (scrollOffset > 2000) {
     console.log('you win!');
+  }
+
+  //Loose condition
+  if (player.position.y > canvas.height) {
+    console.log('you loose');
+    init();
   }
 }
 animate();

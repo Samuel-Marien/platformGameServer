@@ -4,15 +4,14 @@
 import platform from '../img/platform.png'
 import hills from '../img/hills.png'
 import background from '../img/background.png'
+
 console.log('platform', platform)
 
 const canvas = document.querySelector('canvas')
-
 const c = canvas.getContext('2d')
 
 canvas.width = 1024
 canvas.height = 576
-
 const gravity = 1.5
 
 class Player {
@@ -44,8 +43,6 @@ class Player {
 
     if (this.position.y + this.height + this.velocity.y <= canvas.height) {
       this.velocity.y += gravity
-    } else {
-      this.velocity.y = 0
     }
   }
 }
@@ -91,14 +88,23 @@ function createImage(imageSrc) {
 }
 
 // console.log('image', image)
-const platformImage = createImage(platform)
+let platformImage = createImage(platform)
 
-const player = new Player()
-const platforms = [
+let player = new Player()
+let platforms = [
   new Platform({ x: -1, y: 470, image: platformImage }),
-  new Platform({ x: platformImage.width - 3, y: 470, image: platformImage })
+  new Platform({
+    x: platformImage.width - 3,
+    y: 470,
+    image: platformImage
+  }),
+  new Platform({
+    x: platformImage.width * 2 + 100,
+    y: 470,
+    image: platformImage
+  })
 ]
-const genericObjects = [
+let genericObjects = [
   new GenericObject({
     x: -1,
     y: -1,
@@ -122,11 +128,46 @@ const keys = {
 
 let scrollOffset = 0
 
+function init() {
+  // console.log('image', image)
+  platformImage = createImage(platform)
+
+  player = new Player()
+  platforms = [
+    new Platform({ x: -1, y: 470, image: platformImage }),
+    new Platform({
+      x: platformImage.width - 3,
+      y: 470,
+      image: platformImage
+    }),
+    new Platform({
+      x: platformImage.width * 2 + 100,
+      y: 470,
+      image: platformImage
+    })
+  ]
+  genericObjects = [
+    new GenericObject({
+      x: -1,
+      y: -1,
+      image: createImage(background)
+    }),
+    new GenericObject({
+      x: -1,
+      y: -1,
+      image: createImage(hills)
+    })
+  ]
+
+  scrollOffset = 0
+}
+
 function animate() {
-  requestAnimationFrame(animate)
+  requestAnimationFrame(animate) // Make the loop
   c.fillStyle = 'white'
   c.fillRect(0, 0, canvas.width, canvas.height)
 
+  // Backgroud needed to be place in first
   genericObjects.forEach((genericObject) => {
     genericObject.draw()
   })
@@ -137,6 +178,7 @@ function animate() {
 
   player.update()
 
+  // Player movements
   if (keys.right.pressed && player.position.x < 400) {
     player.velocity.x = 5
   } else if (keys.left.pressed && player.position.x > 100) {
@@ -178,8 +220,15 @@ function animate() {
     }
   })
 
+  // WIn condition
   if (scrollOffset > 2000) {
     console.log('you win!')
+  }
+
+  //Loose condition
+  if (player.position.y > canvas.height) {
+    console.log('you loose')
+    init()
   }
 }
 
