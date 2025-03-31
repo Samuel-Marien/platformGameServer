@@ -42,6 +42,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "ffab39d3487de561be1a081fcfb3806d.png");
 
+/***/ }),
+
+/***/ "./src/img/platformSmallTall.png":
+/*!***************************************!*\
+  !*** ./src/img/platformSmallTall.png ***!
+  \***************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "0587f9be8e442eb74b2fe283bbf1a947.png");
+
 /***/ })
 
 /******/ 	});
@@ -143,11 +157,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _img_platform_png__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../img/platform.png */ "./src/img/platform.png");
 /* harmony import */ var _img_hills_png__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../img/hills.png */ "./src/img/hills.png");
 /* harmony import */ var _img_background_png__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../img/background.png */ "./src/img/background.png");
+/* harmony import */ var _img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../img/platformSmallTall.png */ "./src/img/platformSmallTall.png");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 // https://www.youtube.com/watch?v=4q2vvZn5aoo&list=PLpPnRKq7eNW16Wq1GQjQjpTo_E0taH0La&index=2
 // 01:14'
+
 
 
 
@@ -161,6 +177,7 @@ var gravity = 1.5;
 var Player = /*#__PURE__*/function () {
   function Player() {
     _classCallCheck(this, Player);
+    this.speed = 10;
     this.position = {
       x: 100,
       y: 100
@@ -247,32 +264,12 @@ function createImage(imageSrc) {
   image.src = imageSrc;
   return image;
 }
-
-// console.log('image', image)
 var platformImage = createImage(_img_platform_png__WEBPACK_IMPORTED_MODULE_0__["default"]);
+var platformSmallTallImage = createImage(_img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__["default"]);
 var player = new Player();
-var platforms = [new Platform({
-  x: -1,
-  y: 470,
-  image: platformImage
-}), new Platform({
-  x: platformImage.width - 3,
-  y: 470,
-  image: platformImage
-}), new Platform({
-  x: platformImage.width * 2 + 100,
-  y: 470,
-  image: platformImage
-})];
-var genericObjects = [new GenericObject({
-  x: -1,
-  y: -1,
-  image: createImage(_img_background_png__WEBPACK_IMPORTED_MODULE_2__["default"])
-}), new GenericObject({
-  x: -1,
-  y: -1,
-  image: createImage(_img_hills_png__WEBPACK_IMPORTED_MODULE_1__["default"])
-})];
+var platforms = [];
+var genericObjects = [];
+var scrollOffset = 0;
 var keys = {
   right: {
     pressed: false
@@ -281,12 +278,14 @@ var keys = {
     pressed: false
   }
 };
-var scrollOffset = 0;
 function init() {
-  // console.log('image', image)
   platformImage = createImage(_img_platform_png__WEBPACK_IMPORTED_MODULE_0__["default"]);
   player = new Player();
   platforms = [new Platform({
+    x: platformImage.width * 4 + 300 - 2 + platformImage.width - platformSmallTallImage.width,
+    y: 270,
+    image: createImage(_img_platformSmallTall_png__WEBPACK_IMPORTED_MODULE_3__["default"])
+  }), new Platform({
     x: -1,
     y: 470,
     image: platformImage
@@ -296,6 +295,18 @@ function init() {
     image: platformImage
   }), new Platform({
     x: platformImage.width * 2 + 100,
+    y: 470,
+    image: platformImage
+  }), new Platform({
+    x: platformImage.width * 3 + 300,
+    y: 470,
+    image: platformImage
+  }), new Platform({
+    x: platformImage.width * 4 + 300 - 2,
+    y: 470,
+    image: platformImage
+  }), new Platform({
+    x: platformImage.width * 5 + 700 - 2,
     y: 470,
     image: platformImage
   })];
@@ -326,28 +337,28 @@ function animate() {
 
   // Player movements
   if (keys.right.pressed && player.position.x < 400) {
-    player.velocity.x = 5;
+    player.velocity.x = player.speed;
   } else if (keys.left.pressed && player.position.x > 100) {
-    player.velocity.x = -5;
+    player.velocity.x = -player.speed;
   } else {
     player.velocity.x = 0;
 
     // Simulate decor & platform movements
     if (keys.right.pressed) {
-      scrollOffset += 5;
+      scrollOffset += player.speed;
       platforms.forEach(function (platform) {
-        platform.position.x -= 5;
+        platform.position.x -= player.speed;
       });
       genericObjects.forEach(function (genericObject) {
-        genericObject.position.x -= 3;
+        genericObject.position.x -= player.speed * 0.66;
       });
     } else if (keys.left.pressed) {
-      scrollOffset -= 5;
+      scrollOffset -= player.speed;
       platforms.forEach(function (platform) {
-        platform.position.x += 5;
+        platform.position.x += player.speed;
       });
       genericObjects.forEach(function (genericObject) {
-        genericObject.position.x += 3;
+        genericObject.position.x += player.speed * 0.66;
       });
     }
   }
@@ -360,7 +371,7 @@ function animate() {
   });
 
   // WIn condition
-  if (scrollOffset > 2000) {
+  if (scrollOffset > platformImage.width * 5 + 300 - 2) {
     console.log('you win!');
   }
 
@@ -370,24 +381,23 @@ function animate() {
     init();
   }
 }
+init();
 animate();
 window.addEventListener('keydown', function (_ref3) {
   var keyCode = _ref3.keyCode;
   switch (keyCode) {
     case 81:
-      // console.log('left')
       keys.left.pressed = true;
       break;
     case 83:
       // console.log('down')
       break;
     case 68:
-      // console.log('right')
       keys.right.pressed = true;
       break;
     case 90:
       // console.log('up')
-      player.velocity.y -= 20;
+      player.velocity.y -= 25;
       break;
   }
 
@@ -409,7 +419,7 @@ window.addEventListener('keyup', function (_ref4) {
       break;
     case 90:
       // console.log('up')
-      player.velocity.y -= 20;
+      // player.velocity.y -= 20
       break;
   }
 
