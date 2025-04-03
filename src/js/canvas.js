@@ -5,6 +5,10 @@ import platform from '../img/platform.png'
 import hills from '../img/hills.png'
 import background from '../img/background.png'
 import platformSmallTall from '../img/platformSmallTall.png'
+import spriteRunLeft from '../img/spriteRunLeft.png'
+import spriteRunRight from '../img/spriteRunRight.png'
+import spriteStandLeft from '../img/spriteStandLeft.png'
+import spriteStandRight from '../img/spriteStandRight.png'
 
 console.log('platform', platform)
 
@@ -27,18 +31,61 @@ class Player {
       x: 0,
       y: 0
     }
-    this.width = 30
-    this.height = 30
+    this.width = 66
+    this.height = 150
+
+    this.image = createImage(spriteStandRight)
+    this.frames = 0
+    this.sprites = {
+      stand: {
+        right: createImage(spriteStandRight),
+        left: createImage(spriteStandLeft),
+        cropWidth: 177,
+        width: 66
+      },
+      run: {
+        right: createImage(spriteRunRight),
+        left: createImage(spriteRunLeft),
+        cropWidth: 341,
+        width: 127.875
+      }
+    }
+
+    this.currentSprite = this.sprites.stand.right
+    this.currentCropWidth = 177
   }
 
   // interaction with canvas
   draw() {
-    c.fillStyle = 'red'
-    c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    c.drawImage(
+      this.currentSprite,
+      this.currentCropWidth * this.frames,
+      0,
+      this.currentCropWidth,
+      400,
+      this.position.x,
+      this.position.y,
+      this.width,
+      this.height
+    )
   }
 
   //loop game
   update() {
+    this.frames++
+    if (
+      this.frames > 59 &&
+      (this.currentSprite === this.sprites.stand.right ||
+        this.currentSprite === this.sprites.stand.left)
+    ) {
+      this.frames = 0
+    } else if (
+      this.frames > 29 &&
+      (this.currentSprite === this.sprites.run.right ||
+        this.currentSprite === this.sprites.run.left)
+    ) {
+      this.frames = 0
+    }
     this.draw()
     this.position.y += this.velocity.y
     this.position.x += this.velocity.x
@@ -89,6 +136,7 @@ function createImage(imageSrc) {
   return image
 }
 
+let currentKey = null
 let platformImage = createImage(platform)
 let platformSmallTallImage = createImage(platformSmallTall)
 let player = new Player()
@@ -223,6 +271,42 @@ function animate() {
     }
   })
 
+  // Sprite switching
+  if (
+    keys.right.pressed &&
+    currentKey === 'right' &&
+    player.currentSprite !== player.sprites.run.right
+  ) {
+    player.frames = 1
+    player.currentSprite = player.sprites.run.right
+    player.currentCropWidth = player.sprites.run.cropWidth
+    player.width = player.sprites.run.width
+  } else if (
+    keys.left.pressed &&
+    currentKey === 'left' &&
+    player.currentSprite !== player.sprites.run.left
+  ) {
+    player.currentSprite = player.sprites.run.left
+    player.currentCropWidth = player.sprites.run.cropWidth
+    player.width = player.sprites.run.width
+  } else if (
+    !keys.left.pressed &&
+    currentKey === 'left' &&
+    player.currentSprite !== player.sprites.stand.left
+  ) {
+    player.currentSprite = player.sprites.stand.left
+    player.currentCropWidth = player.sprites.stand.cropWidth
+    player.width = player.sprites.stand.width
+  } else if (
+    !keys.right.pressed &&
+    currentKey === 'right' &&
+    player.currentSprite !== player.sprites.stand.right
+  ) {
+    player.currentSprite = player.sprites.stand.right
+    player.currentCropWidth = player.sprites.stand.cropWidth
+    player.width = player.sprites.stand.width
+  }
+
   // WIn condition
   if (scrollOffset > platformImage.width * 5 + 300 - 2) {
     console.log('you win!')
@@ -242,26 +326,25 @@ window.addEventListener('keydown', ({ keyCode }) => {
   switch (keyCode) {
     case 81:
       keys.left.pressed = true
+      currentKey = 'left'
       break
     case 83:
       // console.log('down')
       break
     case 68:
       keys.right.pressed = true
+      currentKey = 'right'
       break
     case 90:
       // console.log('up')
       player.velocity.y -= 25
       break
   }
-
-  // console.log('down pressed', keys.right.pressed)
 })
 
 window.addEventListener('keyup', ({ keyCode }) => {
   switch (keyCode) {
     case 81:
-      // console.log('left')
       keys.left.pressed = false
       break
     case 83:
@@ -270,12 +353,10 @@ window.addEventListener('keyup', ({ keyCode }) => {
     case 68:
       // console.log('right')
       keys.right.pressed = false
+
       break
     case 90:
       // console.log('up')
-      // player.velocity.y -= 20
       break
   }
-
-  // console.log('up pressed', keys.right.pressed)
 })
